@@ -1,0 +1,41 @@
+docker:
+  edition: ce
+  manage_repo: False
+  manage_compose: True
+
+  version: '18.06*'
+  compose_version: 1.22.0
+
+  users:
+    - docker
+
+  config:
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  image_prune: True
+  volume_prune: False
+  network_prune: False
+  container_prune: False
+
+  images:
+    present:
+      registry:
+        tag: 2
+
+  volumes:
+    present:
+      registry-data: {}
+
+  containers:
+    running:
+      registry:
+        image: registry:2
+        volumes_from:
+          - registry-data
+        binds:
+          - /mnt/registry:/var/lib/registry
+        port_bindings:
+          - 5000:5000
+        restart_policy: always

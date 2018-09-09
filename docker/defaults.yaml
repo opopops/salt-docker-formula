@@ -1,0 +1,9 @@
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+docker:
+  manage_repo: True
+  manage_compose: False
+
+  compose_version: 1.22.0
+
+  edition: ce

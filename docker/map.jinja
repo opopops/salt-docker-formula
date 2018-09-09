@@ -1,0 +1,53 @@
+# -*- coding: utf-8 -*-
+# vim: ft=jinja
+
+{%- set cpuarch    = salt['grains.get']('cpuarch') %}
+{%- set kernel     = salt['grains.get']('kernel') %}
+{%- set os         = salt['grains.get']('os') %}
+{%- set osrelease  = salt['grains.get']('osrelease') %}
+{%- set oscodename = salt['grains.get']('oscodename') %}
+
+{## Start with defaults from defaults.yaml ##}
+{% import_yaml 'docker/defaults.yaml' as default_settings %}
+
+{% set edition         = salt['pillar.get']('docker:edition', default_settings.docker.edition) %}
+{% set compose_version = salt['pillar.get']('docker:compose_version', default_settings.docker.compose_version) %}
+
+{##
+Setup variables using grains['os_family'] based logic, only add key:values
+that differ from what is in defaults.yaml
+##}
+{% set os_family_map = salt['grains.filter_by']({
+    'Debian': {
+        'repo': {
+            'humanname': 'docker',
+            'name': 'deb https://download.docker.com/linux/' ~ os|lower ~ ' ' ~ oscodename|lower ~ ' stable',
+            'file': '/etc/apt/sources.list.d/docker.list',
+            'keyserver': 'pgp.mit.edu',
+            'keyid': '9DC858229FC7DD38854AE2D88D81803C0EBFCD88',
+        },
+        'repo_pkgs': ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg2', 'software-properties-common'],
+        'pkg': 'docker-' ~ edition,
+        'python_pkgs': ['python-pip', 'python-setuptools'],
+        'pip_pkgs': ['docker'],
+        'pip_bin_env': '/usr/bin/python',
+        'conf_file': '/etc/docker/daemon.json',
+        'group': 'docker',
+        'service': 'docker',
+        'compose_source': 'https://github.com/docker/compose/releases/download/' ~ compose_version ~ '/docker-compose-' ~ kernel ~ '-' ~ cpuarch,
+        'compose_path': '/usr/local/bin/docker-compose',
+    },
+}
+, grain="os_family"
+, merge=salt['pillar.get']('docker:lookup')) %}
+
+{## Merge the flavor_map to the default settings ##}
+{% do default_settings.docker.update(os_family_map) %}
+
+{## Merge in docker:lookup pillar ##}
+{% set docker = salt['pillar.get'](
+        'docker',
+        default=default_settings.docker,
+        merge=True
+    )
+%}
