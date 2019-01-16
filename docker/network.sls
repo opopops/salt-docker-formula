@@ -22,8 +22,4 @@ docker_network_{{network}}:
     {%- for k, v in params.items() %}
     - {{k}}: {{v}}
     {%- endfor %}
-    {%- if docker.get('network_prune', False) %}
-    - require:
-      - cmd: docker_network_prune
-    {%- endif %}
 {%- endfor %}

@@ -22,8 +22,4 @@ docker_volume_{{volume}}:
     {%- for k, v in params.items() %}
     - {{k}}: {{v}}
     {%- endfor %}
-    {%- if docker.get('volume_prune', False) %}
-    - require:
-      - cmd: docker_volume_prune
-    {%- endif %}
 {%- endfor %}

@@ -2,8 +2,9 @@
 # vim: ft=yaml
 docker:
   manage_repo: True
-  manage_compose: False
-
-  compose_version: 1.22.0
 
   edition: ce
+
+  compose:
+    version: 1.23.2
+    pip_install: False

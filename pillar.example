@@ -1,18 +1,28 @@
 docker:
-  edition: ce
   manage_repo: False
-  manage_compose: True
 
-  version: '18.06*'
-  compose_version: 1.22.0
+  version: '18.09*'
+  edition: ce
+
+  daemon:
+    options: []
 
   users:
-    - docker
+    - dock
 
   config:
     dns:
       - 8.8.8.8
       - 8.8.4.4
+    graph: /data/docker
+    hosts:
+      - unix:///var/run/docker.sock
+      - tcp://0.0.0.0:2376
+    log-opts:
+      max-file: 7
+      max-size: 1m
+    registry-mirrors:
+      - https://registry.docker.io:5500
 
   image_prune: True
   volume_prune: False
@@ -39,3 +49,17 @@ docker:
         port_bindings:
           - 5000:5000
         restart_policy: always
+
+  compose:
+    version: 1.23.2
+    projects:
+      project:
+        path: /compose/project
+        user: dock
+        group: dock
+        source: http://compose.io/project.tar.gz:
+        source_hash: http://compose.io/project.tar.gz.md5
+        archive_options: --strip-components=1
+        commands:
+          - name: pull
+          - name: up

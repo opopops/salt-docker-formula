@@ -22,8 +22,4 @@ docker_container_{{container}}:
     {%- for k, v in params.items() %}
     - {{k}}: {{v}}
     {%- endfor %}
-    {%- if docker.get('container_prune', False) %}
-    - require:
-      - cmd: docker_container_prune
-    {%- endif %}
 {%- endfor %}
