@@ -24,7 +24,6 @@ docker_python_packages:
 docker_pip_package:
   pip.installed:
     - pkgs: {{ docker.pip_pkgs }}
-    - bin_env: {{ docker.pip_bin_env }}
     - reload_modules: True
     - require:
       - pkg: docker_python_packages

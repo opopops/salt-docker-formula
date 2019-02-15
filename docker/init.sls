@@ -5,6 +5,7 @@ include:
   - docker.install
   - docker.config
   - docker.service
+  - docker.login
   - docker.image
   - docker.network
   - docker.volume

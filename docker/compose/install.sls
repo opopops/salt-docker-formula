@@ -7,7 +7,6 @@ include:
 docker_compose:
   pip.installed:
     - name: docker-compose == {{docker.compose.version}}
-    - bin_env: {{ docker.pip_bin_env }}
     - reload_modules: True
     - require:
       - pkg: docker_pip_package
