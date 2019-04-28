@@ -3,12 +3,6 @@
 include:
   - docker.service
 
-{%- if docker.get('network_prune', False) %}
-docker_network_prune:
-  cmd.run:
-    - name: docker network prune -f
-{%- endif %}
-
 {%- for network, params in docker.get('networks', {}).get('absent', {}).items() %}
 docker_network_{{network}}:
   docker_network.absent:

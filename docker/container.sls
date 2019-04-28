@@ -3,12 +3,6 @@
 include:
   - docker.service
 
-{%- if docker.get('container_prune', False) %}
-docker_container_prune:
-  cmd.run:
-    - name: docker container prune -f
-{%- endif %}
-
 {%- for container, params in docker.get('containers', {}).get('absent', {}).items() %}
 docker_container_{{container}}:
   docker_container.absent:

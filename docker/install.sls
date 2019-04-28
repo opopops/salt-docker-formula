@@ -27,3 +27,13 @@ docker_pip_package:
     - reload_modules: True
     - require:
       - pkg: docker_python_packages
+
+{%- if docker.get('manage_awscli', False) %}
+docker_awscli_pip_package:
+  pip.installed:
+    - name: {{ docker.awscli_pip_pkg }}
+    - bin_env: {{ docker.python3_bin }}
+    - reload_modules: True
+    - require:
+      - pkg: docker_python_packages
+{%- endif %}

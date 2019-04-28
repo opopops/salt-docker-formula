@@ -2,6 +2,7 @@
 # vim: ft=yaml
 docker:
   manage_repo: True
+  manage_awscli: False
 
   edition: ce
 

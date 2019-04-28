@@ -3,12 +3,6 @@
 include:
   - docker.service
 
-{%- if docker.get('volume_prune', False) %}
-docker_volume_prune:
-  cmd.run:
-    - name: docker volume prune -f
-{%- endif %}
-
 {%- for volume, params in docker.get('volumes', {}).get('absent', {}).items() %}
 docker_volume_{{volume}}:
   docker_volume.absent:
