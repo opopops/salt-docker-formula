@@ -1,5 +1,6 @@
 docker:
   manage_repo: False
+  manage_awscli: True
 
   version: '18.09*'
   edition: ce
@@ -9,6 +10,9 @@ docker:
 
   users:
     - dock
+
+  # do not restart docker service even if configuration has changed
+  service_watch: False
 
   config:
     dns:
@@ -29,10 +33,23 @@ docker:
   network_prune: False
   container_prune: False
 
+  login:
+    registry.docker.io:
+      user: user1
+      password: stupidpassword
+    registry.ecr.aws.com:
+      method: aws
+      env:
+        AWS_REGION: eu-west-3
+        AWS_ACCESS_KEY_ID: keyid
+        AWS_SECRET_ACCESS_KEY: accesskey
+
   images:
     present:
       registry:
         tag: 2
+        aliases:
+          - latest
 
   volumes:
     present:

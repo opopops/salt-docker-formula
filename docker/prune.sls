@@ -14,6 +14,7 @@ docker_network_prune:
   cmd.run:
     - name: docker network prune -f
     - require:
+      - service: docker_service
       - sls: docker.network
 {%- endif %}
 
@@ -22,7 +23,7 @@ docker_container_prune:
   cmd.run:
     - name: docker container prune -f
     - require:
-      - sls: docker.container
+      - service: docker_service
 {%- endif %}
 
 {%- if docker.get('volume_prune', False) %}
@@ -30,7 +31,7 @@ docker_volume_prune:
   cmd.run:
     - name: docker volume prune -f
     - require:
-      - sls: docker.container
+      - service: docker_service
 {%- endif %}
 
 {%- if docker.get('image_prune', False) %}
@@ -38,5 +39,5 @@ docker_image_prune:
   cmd.run:
     - name: docker image prune -f
     - require:
-      - sls: docker.container
+      - service: docker_service
 {%- endif %}

@@ -3,17 +3,34 @@
 include:
   - docker.service
 
-{%- for image, params in docker.get('images', {}).get('absent', {}).items() %}
-docker_image_{{image}}:
+{%- for repo, params in docker.get('images', {}).get('absent', {}).items() %}
+docker_image_{{repo}}:
   docker_image.absent:
-    - name: {{image}}
+    - name: {{repo}}
+    - require:
+      - service: docker_service
 {%- endfor %}
 
-{%- for image, params in docker.get('images', {}).get('present', {}).items() %}
-docker_image_{{image}}:
+{%- for repo, params in docker.get('images', {}).get('present', {}).items() %}
+docker_image_{{repo}}:
   docker_image.present:
-    - name: {{image}}
+    - name: {{repo}}
     {%- for k, v in params.items() %}
+      {%- if k not in ['aliases'] %}
     - {{k}}: {{v}}
+      {%- endif %}
     {%- endfor %}
+    - require:
+      - service: docker_service
+
+  {%- for alias in params.get('aliases', []) %}
+docker_image_alias_{{repo}}_{{alias}}:
+  module.run:
+    - docker.tag:
+      - name: {{repo}}:{{params.tag}}
+      - repository: {{repo}}
+      - tag: {{alias}}
+    - require:
+      - docker_image: docker_image_{{repo}}
+  {%- endfor %}
 {%- endfor %}

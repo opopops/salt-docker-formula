@@ -7,6 +7,8 @@ include:
 docker_container_{{container}}:
   docker_container.absent:
     - name: {{container}}
+    - require:
+      - service: docker_service
 {%- endfor %}
 
 {%- for container, params in docker.get('containers', {}).get('running', {}).items() %}
@@ -16,4 +18,6 @@ docker_container_{{container}}:
     {%- for k, v in params.items() %}
     - {{k}}: {{v}}
     {%- endfor %}
+    - require:
+      - service: docker_service
 {%- endfor %}

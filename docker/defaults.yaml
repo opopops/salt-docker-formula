@@ -6,6 +6,9 @@ docker:
 
   edition: ce
 
+  # restart docker service on configuration updates
+  service_watch: True
+
   compose:
     version: 1.23.2
     pip_install: False

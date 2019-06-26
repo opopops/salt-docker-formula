@@ -1,6 +1,7 @@
 {%- from "docker/map.jinja" import docker with context %}
 
 include:
+  - docker.service
   - docker.compose.install
 
 {%- for project, params in docker.compose.get('projects', {}).items() %}

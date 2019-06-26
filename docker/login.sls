@@ -2,7 +2,7 @@
 {%- from "docker/map.jinja" import docker with context %}
 
 include:
-  - docker.install
+  - docker.service
 
 {%- for registry, auth in docker.get('login', {}).items() %}
   {%- if auth.get('method', 'docker') == 'aws' %}

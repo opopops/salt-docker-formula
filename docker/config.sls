@@ -8,8 +8,10 @@ docker_group:
   group.present:
     - name: {{ docker.group }}
     - addusers: {{ docker.get('users', []) }}
+    {%- if docker.service_watch %}
     - watch_in:
       - service: docker_service
+    {%- endif %}
 
 {%- if docker.get('config', False) %}
 docker_config:
@@ -21,6 +23,8 @@ docker_config:
     - group: root
     - mode: 644
     - makedirs: True
+    {%- if docker.service_watch %}
     - watch_in:
       - service: docker_service
+    {%- endif %}
 {%- endif %}

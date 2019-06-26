@@ -6,9 +6,11 @@ include:
 
 docker_systemctl_reload:
   module.wait:
-    - systemd.systemctl_reload: {}
+    - service.systemctl_reload: {}
+    {%- if docker.service_watch %}
     - watch_in:
       - service: docker_service
+    {%- endif %}
 
 {%- if docker.get('daemon', False) %}
   {%- if docker.daemon.get('options', False) %}
@@ -20,7 +22,12 @@ docker_daemon_options:
     - append_if_not_found: True
     - watch_in:
       - module: docker_systemctl_reload
+    {%- if docker.service_watch %}
       - service: docker_service
+    {%- else %}
+    - require_in:
+      - service: docker_service
+    {%- endif %}
   {%- endif %}
 {%- endif %}
 
