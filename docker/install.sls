@@ -3,6 +3,17 @@
 include:
   - docker.repo
 
+docker_cli_package:
+  pkg.installed:
+    - name: {{ docker.pkg }}-cli
+    {%- if docker.version is defined %}
+    - version: {{ docker.version }}
+    {%- endif %}
+    {%- if docker.manage_repo %}
+    - require:
+      - sls: docker.repo
+    {%- endif %}
+
 docker_package:
   pkg.installed:
     - name: {{ docker.pkg }}
@@ -12,6 +23,7 @@ docker_package:
     {%- if docker.manage_repo %}
     - require:
       - sls: docker.repo
+      - pkg: docker_cli_pkg
     {%- endif %}
 
 docker_python_packages:

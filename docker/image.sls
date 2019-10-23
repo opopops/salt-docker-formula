@@ -7,8 +7,6 @@ include:
 docker_image_{{repo}}:
   docker_image.absent:
     - name: {{repo}}
-    - require:
-      - service: docker_service
 {%- endfor %}
 
 {%- for repo, params in docker.get('images', {}).get('present', {}).items() %}
@@ -20,8 +18,6 @@ docker_image_{{repo}}:
     - {{k}}: {{v}}
       {%- endif %}
     {%- endfor %}
-    - require:
-      - service: docker_service
 
   {%- for alias in params.get('aliases', []) %}
 docker_image_alias_{{repo}}_{{alias}}:

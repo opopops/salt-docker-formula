@@ -10,5 +10,8 @@ docker:
   service_watch: True
 
   compose:
-    version: 1.23.2
+    version: 1.24.1
     pip_install: False
+
+  buildx:
+    version: v0.3.1

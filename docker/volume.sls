@@ -7,8 +7,6 @@ include:
 docker_volume_{{volume}}:
   docker_volume.absent:
     - name: {{volume}}
-    - require:
-      - service: docker_service
 {%- endfor %}
 
 {%- for volume, params in docker.get('volumes', {}).get('present', {}).items() %}
@@ -18,6 +16,4 @@ docker_volume_{{volume}}:
     {%- for k, v in params.items() %}
     - {{k}}: {{v}}
     {%- endfor %}
-    - require:
-      - service: docker_service
 {%- endfor %}
