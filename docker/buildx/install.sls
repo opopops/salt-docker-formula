@@ -16,4 +16,11 @@ docker_buildx_{{user}}:
     - user: {{ user }}
     - mode: 755
     - makedirs: True
+
+  {%- if docker.buildx.get('install', False) %}
+docker_buildx_{{user}}_install:
+  cmd.run:
+    - runas: {{user}}
+    - cmd: docker buildx install
+  {%- endif %}
 {%- endfor %}

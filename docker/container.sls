@@ -2,6 +2,8 @@
 
 include:
   - docker.service
+  - docker.network
+  - docker.volume
 
 {%- for container, params in docker.get('containers', {}).get('absent', {}).items() %}
 docker_container_{{container}}:

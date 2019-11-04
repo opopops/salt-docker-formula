@@ -10,4 +10,5 @@ include:
   - docker.network
   - docker.volume
   - docker.container
+  - docker.exec
   - docker.prune

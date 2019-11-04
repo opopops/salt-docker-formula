@@ -67,6 +67,16 @@ docker:
           - 5000:5000
         restart_policy: always
 
+  exec:
+    containerid:
+      - name: echo bye
+        args: -u 0
+        onlyif: echo hello
+
+  buildx:
+    version: 0.3.1
+    install: True
+
   compose:
     version: 1.23.2
     projects:
