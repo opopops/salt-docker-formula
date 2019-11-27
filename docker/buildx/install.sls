@@ -21,6 +21,6 @@ docker_buildx_{{user}}:
 docker_buildx_{{user}}_install:
   cmd.run:
     - runas: {{user}}
-    - cmd: docker buildx install
+    - name: docker buildx install
   {%- endif %}
 {%- endfor %}
