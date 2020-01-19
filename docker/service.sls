@@ -4,6 +4,38 @@ include:
   - docker.install
   - docker.config
 
+{%- for service, params in docker.get('systemd', {}).items() %}
+  {%- if service == 'containerd' %}
+docker_containerd_systemd:
+  file.managed:
+    - name: {{docker.containerd_service_file}}
+    - source: {{params.source}}
+    {%- if params.get('source_hash', False) %}
+    - source_hash: {{params.source_hash}}
+    {%- endif %}
+    - user: root
+    - group: root
+    - mode: 644
+    - template: jinja
+    - watch_in:
+      - module: docker_systemctl_reload
+  {%- elif service == 'docker' %}
+docker_systemd:
+  file.managed:
+    - name: {{docker.docker_service_file}}
+    - source: {{params.source}}
+    {%- if params.get('source_hash', False) %}
+    - source_hash: {{params.source_hash}}
+    {%- endif %}
+    - user: root
+    - group: root
+    - mode: 644
+    - template: jinja
+    - watch_in:
+      - module: docker_systemctl_reload
+  {%- endif %}
+{%- endfor %}
+
 docker_systemctl_reload:
   module.wait:
     - service.systemctl_reload: {}
@@ -12,28 +44,10 @@ docker_systemctl_reload:
       - service: docker_service
     {%- endif %}
 
-{%- if docker.get('daemon', False) %}
-  {%- if docker.daemon.get('options', False) %}
-docker_daemon_options:
-  file.replace:
-    - name: {{ docker.docker_service_file }}
-    - pattern: '^ExecStart=/usr/bin/dockerd.*$'
-    - repl: 'ExecStart=/usr/bin/dockerd {{docker.daemon.get('options', [])|join(' ')}}'
-    - append_if_not_found: True
-    - watch_in:
-      - module: docker_systemctl_reload
-    {%- if docker.service_watch %}
-      - service: docker_service
-    {%- else %}
-    - require_in:
-      - service: docker_service
-    {%- endif %}
-  {%- endif %}
-{%- endif %}
-
 docker_service:
   service.running:
     - name: {{ docker.service }}
     - enable: True
     - require:
       - pkg: docker_package
+      - module: docker_systemctl_reload

@@ -11,8 +11,9 @@
 {% import_yaml 'docker/defaults.yaml' as default_settings %}
 
 {% set edition         = salt['pillar.get']('docker:edition', default_settings.docker.edition) %}
-{% set compose_version = salt['pillar.get']('docker:compose:version', default_settings.docker.compose.version) %}
 {% set buildx_version  = salt['pillar.get']('docker:buildx:version', default_settings.docker.buildx.version) %}
+{% set compose_version = salt['pillar.get']('docker:compose:version', default_settings.docker.compose.version) %}
+{% set slim_version    = salt['pillar.get']('docker:slim:version', default_settings.docker.slim.version) %}
 
 {##
 Setup variables using grains['os_family'] based logic, only add key:values
@@ -20,6 +21,23 @@ that differ from what is in defaults.yaml
 ##}
 {% set os_family_map = salt['grains.filter_by']({
     'Debian': {
+        'awscli_pip_pkg': 'awscli',
+        'bin_dir': '/usr/local/bin',
+        'buildx_source': 'https://github.com/docker/buildx/releases/download/' ~ buildx_version ~ '/buildx-' ~ buildx_version ~ '.' ~ kernel|lower ~ '-amd64',
+        'compose_path': '/usr/local/bin/docker-compose',
+        'compose_source': 'https://github.com/docker/compose/releases/download/' ~ compose_version ~ '/docker-compose-' ~ kernel ~ '-' ~ cpuarch,
+        'conf_file': '/etc/docker/daemon.json',
+        'containerd_service_file': '/lib/systemd/system/containerd.service',
+        'containerd_service': 'containerd',
+        'docker_service_file': '/lib/systemd/system/docker.service',
+        'group': 'docker',
+        'pip_bin': '/usr/bin/pip',
+        'pip_pkgs': ['docker'],
+        'pip3_bin': '/usr/bin/pip3',
+        'pkg': 'docker-' ~ edition,
+        'python_bin': '/usr/bin/python',
+        'python_pkgs': ['python-pip', 'python-setuptools', 'python3-pip', 'python3-setuptools'],
+        'python3_bin': '/usr/bin/python3',
         'repo': {
             'humanname': 'docker',
             'name': 'deb https://download.docker.com/linux/' ~ os|lower ~ ' ' ~ oscodename|lower ~ ' stable',
@@ -28,23 +46,9 @@ that differ from what is in defaults.yaml
             'keyid': '9DC858229FC7DD38854AE2D88D81803C0EBFCD88',
         },
         'repo_pkgs': ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg2', 'software-properties-common'],
-        'pkg': 'docker-' ~ edition,
-        'python_pkgs': ['python-pip', 'python-setuptools', 'python3-pip', 'python3-setuptools'],
-        'pip_pkgs': ['docker'],
-        'awscli_pip_pkg': 'awscli',
-        'python_bin': '/usr/bin/python',
-        'python3_bin': '/usr/bin/python3',
-        'pip_bin': '/usr/bin/pip',
-        'pip3_bin': '/usr/bin/pip3',
-        'conf_file': '/etc/docker/daemon.json',
-        'group': 'docker',
         'service': 'docker',
-        'docker_service_file': '/lib/systemd/system/docker.service',
-        'containerd_service_file': '/lib/systemd/system/containerd.service',
+        'slim_source': 'https://github.com/docker-slim/docker-slim/releases/download/' ~ slim_version ~ '/dist_' ~ kernel|lower ~ '.tar.gz',
         'users_home_dir': '/home',
-        'compose_source': 'https://github.com/docker/compose/releases/download/' ~ compose_version ~ '/docker-compose-' ~ kernel ~ '-' ~ cpuarch,
-        'compose_path': '/usr/local/bin/docker-compose',
-        'buildx_source': 'https://github.com/docker/buildx/releases/download/' ~ buildx_version ~ '/buildx-' ~ buildx_version ~ '.' ~ kernel|lower ~ '-amd64',
     },
 }
 , grain="os_family"

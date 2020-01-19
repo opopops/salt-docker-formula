@@ -16,6 +16,9 @@ docker_login_{{registry}}:
       {%- if docker.get('manage_awscli', False) %}
       - pip: docker_awscli_pip_package
       {%- endif %}
+    - retry:
+        attempts: 3
+        interval: 10
   {%- else %}
 docker_login_{{registry}}:
   file.managed:
@@ -31,5 +34,8 @@ docker_login_{{registry}}:
     - name: cat /tmp/.{{registry}} | docker login --username {{auth.user}} --password-stdin {{registry}} ; rm -f /tmp/.{{registry}}
     - require:
       - pkg: docker_package
+    - retry:
+        attempts: 3
+        interval: 10
   {%- endif %}
 {%- endfor %}

@@ -5,8 +5,13 @@ docker:
   version: '18.09*'
   edition: ce
 
-  daemon:
-    options: []
+  systemd:
+    containerd:
+      source: salt://docker/systemd/containerd.service
+      source_hash: 792afd5902fe54ab0b60930641a329e2
+    docker:
+      source: salt://docker/systemd/docker.service
+      source_hash: 792afd5902fe54ab0b60930641a329e2
 
   users:
     - dock

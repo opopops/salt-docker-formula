@@ -32,6 +32,11 @@ docker_compose_project_{{project}}_source:
     {%- endif %}
     - require:
       - file: docker_compose_project_{{project}}_directory
+    {%- if params.get('retry', False) %}
+    - retry:
+        attempts: 3
+        interval: 30
+    {%- endif %}
   {%- elif params.source.split('.')|last in ['gz', 'tgz', 'zip'] %}
 docker_compose_project_{{project}}_source:
   archive.extracted:
@@ -54,6 +59,11 @@ docker_compose_project_{{project}}_source:
     - trim_output: True
     - require:
       - file: docker_compose_project_{{project}}_directory
+    {%- if params.get('retry', False) %}
+    - retry:
+        attempts: 3
+        interval: 30
+    {%- endif %}
   {%- else %}
 docker_compose_project_{{project}}_source:
   file.recurse:
@@ -71,6 +81,11 @@ docker_compose_project_{{project}}_source:
     {%- endif %}
     - require:
       - file: docker_compose_project_{{project}}_directory
+  {%- endif %}
+  {%- if params.get('retry', False) %}
+    - retry:
+        attempts: 3
+        interval: 30
   {%- endif %}
 
   {% for command in params.get('commands', []) %}
@@ -92,6 +107,11 @@ docker_compose_project_{{project}}_command_{{loop.index}}:
     {%- else %}
     - require:
       - file: docker_compose_project_{{project}}_source
+    {%- endif %}
+    {%- if command.get('retry', False) %}
+    - retry:
+        attempts: 3
+        interval: 30
     {%- endif %}
   {%- endfor %}
 
