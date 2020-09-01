@@ -5,11 +5,14 @@ include:
 
 {%- if docker.compose.get('pip_install', False) %}
 docker_compose:
+  pkg.installed:
+    - pkgs: {{ docker.compose_pip_require_pkgs }}
   pip.installed:
     - name: docker-compose == {{docker.compose.version}}
+    - bin_env: {{ docker.python_bin }}
     - reload_modules: True
     - require:
-      - pkg: docker_pip_package
+      - pkg: docker_python_packages
 {%- else %}
 docker_compose:
   file.managed:

@@ -4,6 +4,7 @@
 {%- set cpuarch    = salt['grains.get']('cpuarch') %}
 {%- set kernel     = salt['grains.get']('kernel') %}
 {%- set os         = salt['grains.get']('os') %}
+{%- set osarch     = salt['grains.get']('osarch') %}
 {%- set osrelease  = salt['grains.get']('osrelease') %}
 {%- set oscodename = salt['grains.get']('oscodename') %}
 
@@ -23,7 +24,10 @@ that differ from what is in defaults.yaml
     'Debian': {
         'awscli_pip_pkg': 'awscli',
         'bin_dir': '/usr/local/bin',
-        'buildx_source': 'https://github.com/docker/buildx/releases/download/' ~ buildx_version ~ '/buildx-' ~ buildx_version ~ '.' ~ kernel|lower ~ '-amd64',
+        'buildx_source': salt['grains.filter_by']({
+            'Raspbian': 'https://github.com/docker/buildx/releases/download/' ~ buildx_version ~ '/buildx-' ~ buildx_version ~ '.' ~ kernel|lower ~ '-arm-v7',
+            'default': 'https://github.com/docker/buildx/releases/download/' ~ buildx_version ~ '/buildx-' ~ buildx_version ~ '.' ~ kernel|lower ~ '-' ~ osarch
+        }, grain="os"),
         'compose_path': '/usr/local/bin/docker-compose',
         'compose_source': 'https://github.com/docker/compose/releases/download/' ~ compose_version ~ '/docker-compose-' ~ kernel ~ '-' ~ cpuarch,
         'conf_file': '/etc/docker/daemon.json',
@@ -31,24 +35,39 @@ that differ from what is in defaults.yaml
         'containerd_service': 'containerd',
         'docker_service_file': '/lib/systemd/system/docker.service',
         'group': 'docker',
-        'pip_bin': '/usr/bin/pip',
-        'pip_pkgs': ['docker'],
-        'pip3_bin': '/usr/bin/pip3',
+        'pip_bin': '/usr/bin/pip3',
+        'pip_pkgs': [],
         'pkg': 'docker-' ~ edition,
-        'python_bin': '/usr/bin/python',
-        'python_pkgs': ['python-pip', 'python-setuptools', 'python3-pip', 'python3-setuptools'],
-        'python3_bin': '/usr/bin/python3',
+        'python_bin': '/usr/bin/python3',
+        'python_pkgs': [
+            'python3-docker',
+            'python3-pip',
+            'python3-setuptools',
+        ],
+        'require_pkgs': [
+            'gnupg2',
+            'pass',
+        ],
+        'compose_pip_require_pkgs': [
+            'libffi-dev',
+            'libssl-dev',
+        ],
         'repo': {
             'humanname': 'docker',
-            'name': 'deb https://download.docker.com/linux/' ~ os|lower ~ ' ' ~ oscodename|lower ~ ' stable',
+            'name': salt['grains.filter_by']({
+                 'Raspbian': 'deb https://download.docker.com/linux/debian ' ~ oscodename|lower ~ ' stable',
+                 'default': 'deb https://download.docker.com/linux/' ~ os|lower ~ ' ' ~ oscodename|lower ~ ' stable'
+            }, grain="os"),
+            'architectures': osarch,
             'file': '/etc/apt/sources.list.d/docker.list',
-            'keyserver': 'pgp.mit.edu',
+            'keyserver': 'hkps://keyserver.ubuntu.com:443',
             'keyid': '9DC858229FC7DD38854AE2D88D81803C0EBFCD88',
         },
         'repo_pkgs': ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg2', 'software-properties-common'],
         'service': 'docker',
         'slim_source': 'https://github.com/docker-slim/docker-slim/releases/download/' ~ slim_version ~ '/dist_' ~ kernel|lower ~ '.tar.gz',
         'users_home_dir': '/home',
+        'root_home_dir': '/root',
     },
 }
 , grain="os_family"

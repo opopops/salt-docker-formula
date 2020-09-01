@@ -9,7 +9,7 @@
 docker_repo_pkgs:
   pkg.installed:
     - pkgs: {{ docker.repo_pkgs }}
-  
+
   {%- if 'repo' in docker and docker.repo is mapping %}
 docker_repo:
   pkgrepo.managed:
@@ -17,7 +17,7 @@ docker_repo:
     - {{k}}: {{v}}
     {%- endfor %}
     - retry:
-        attempts: 5
+        attempts: 3
         interval: 10
   {%- endif %}
     - require:
